@@ -1,0 +1,41 @@
+### Model
+model_name_or_path: /home/jtan/llm/models/Qwen2.5-7B-Instruct
+trust_remote_code: true
+adapter_name_or_path: saves/cyberlllm_sft_rank64
+
+### Method
+stage: dpo
+do_train: true
+finetuning_type: lora
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+lora_target: all
+pref_beta: 0.1
+pref_loss: sigmoid
+
+### Dataset
+dataset: cyberlllm_dpo
+template: qwen
+cutoff_len: 1024
+overwrite_cache: false
+preprocessing_num_workers: 16
+
+### Output
+output_dir: saves/cyberlllm_dpo_rank64
+logging_steps: 10
+save_steps: 100
+plot_loss: true
+overwrite_output_dir: true
+report_to: none
+
+### Training
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+gradient_checkpointing: true

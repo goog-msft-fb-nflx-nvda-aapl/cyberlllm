@@ -1,0 +1,5 @@
+.DS_Store
+.claude/
+reports/Group14_termprojectv2.pdf
+__pycache__/
+*.pyc
