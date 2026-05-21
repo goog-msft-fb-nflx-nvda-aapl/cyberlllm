@@ -10,6 +10,8 @@ Date: 2026-05-21
 PROJECT TITLE: CyberLLM: Multi-Stage Fine-Tuning of Large Language Models
               for Cybersecurity Threat Intelligence via SFT and DPO
 
+GitHub Repository: https://github.com/goog-msft-fb-nflx-nvda-aapl/cyberlllm
+
 --------------------------------------------------------------------------
 ABSTRACT
 --------------------------------------------------------------------------
@@ -231,6 +233,41 @@ of the higher LoRA capacity providing better initial alignment from SFT.
 The best model (SFT rank=64) achieves 83% accuracy, representing a
 12.2% relative improvement over the baseline and surpassing the 80%
 mark commonly considered strong for 7B models on MMLU Computer Security.
+
+4.5 Answer Distribution and A-Bias Correction
+
+Beyond accuracy, we analyze the predicted answer distribution across all
+models. The gold (correct) label distribution is A=28, B=24, C=30, D=18.
+
+  Model        |  A   |  B   |  C   |  D
+  -------------|------|------|------|------
+  Gold         |  28  |  24  |  30  |  18
+  Baseline     |  37  |  20  |  24  |  19
+  SFT rank=32  |  34  |  19  |  29  |  18
+  SFT rank=64  |  34  |  20  |  29  |  17
+  DPO rank=32  |  32  |  20  |  29  |  19
+  DPO rank=64  |  33  |  20  |  28  |  19
+
+The baseline over-predicts A (37 vs gold 28) and under-predicts C (24 vs
+gold 30) -- a well-documented "A-bias" in LLMs on multiple-choice tasks,
+where models default to option A under uncertainty. Fine-tuning with
+rank=64 reduces A predictions from 37 to 34 and increases C from 24 to 29,
+substantially improving calibration toward the true label distribution.
+DPO further reduces A-bias (rank=32 DPO: A=32), moving the distribution
+even closer to the gold standard.
+
+4.6 Error Analysis: Zero Regressions
+
+SFT rank=64 correctly answers exactly 9 questions that the baseline
+answered incorrectly, with zero regressions (no question went from correct
+under baseline to wrong under rank=64). This monotonic improvement confirms
+that domain fine-tuning adds cybersecurity knowledge without degrading
+existing capabilities. In 7 of the 9 corrected questions, the baseline had
+predicted A incorrectly (A-bias), while rank=64 predicted the true answer.
+
+DPO rank=64 regresses on 2 questions vs SFT rank=64, both cases switching
+to option D, consistent with the DPO preference distribution shifting away
+from the NIST-classification training domain.
 
 --------------------------------------------------------------------------
 5. ANALYSIS AND DISCUSSION
